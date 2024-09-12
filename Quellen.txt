@@ -3,3 +3,4 @@ Bildquellen der Website:
   - Bild Schönwetter: https://www.rosenheim24.de/assets/images/7/639/7639277-1954074307-wetter-1j70.jpg
   - Bild Regenwetter: https://images.ctfassets.net/4ivszygz9914/5AZCB8KFHqYgE0FFAH34A6/e52551ba7e0abe3517488bf90187e1ad/regen.jpg?fm=webp
   - Bild Menübutton: https://www.flaticon.com/de/kostenloses-icon/menu-drei-umrissene-balken_58497
+  - Bild Plakat Raspberry Pi: https://www.soselectronic.com/de/products/raspberry-pi/raspberry-pi-3-model-b-1-292268
