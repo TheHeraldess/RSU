@@ -5,3 +5,4 @@ Bildquellen der Website:
   - Bild Menübutton: https://www.flaticon.com/de/kostenloses-icon/menu-drei-umrissene-balken_58497
   - Bild Plakat Raspberry Pi: https://www.soselectronic.com/de/products/raspberry-pi/raspberry-pi-3-model-b-1-292268
   - Bild Plakat Ethernet-Symbol: https://icon-icons.com/de/symbol/ethernet/64699
+  - Bild Plakat Leute im Regen: https://eu.usatoday.com/story/news/factcheck/2023/04/19/fact-check-viral-post-errs-meaning-30-chance-rain/11682149002/
