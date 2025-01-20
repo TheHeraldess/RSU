@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang='de'>
+  <head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Regenradar</title>
+    <link rel='preconnect' href='https://fonts.googleapis.com'>
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+    <link href='https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,500;1,500&display=swap' rel='stylesheet'>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #F3F5F6;
+        }
+        #oben{
+            padding-left: calc(100vw * 0.05);
+            padding-right: calc(100vw * 0.05);
+        }
+        a {
+            color: #831D17;
+            text-decoration: none;
+            margin-left: 16px;
+            font-weight: 700;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        script {
+            background-color: aliceblue;
+            font-weight: 700;
+        }
+        .headline {
+            color: black;
+        }
+        .headline:hover{
+            text-decoration: none;
+        }
+        .navbar {
+            display: flex;justify-content: space-between;
+            align-items: center;
+            background-color: aliceblue;
+            padding: 8px;
+        }
+        .unten{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 400px;
+            padding left: calc(100vw * 0.055);
+            padding right: calc(100vw * 0.055);
+            color: white;
+            background-color: white;
+        }
+        .menubtn{
+            display: none;
+            border-left: none;
+        }
+        #menubtn2{
+            border: none;
+            background: none;
+        }
+        .menubild{
+            width: 40px;
+        }
+        
+        #links2{
+            display: none;
+        }
+        .trennstrich{
+            height: 2px;
+            width: 95%;
+            background-color: black;
+            margin: auto;
+            margin-top: 260px;
+        }
+        .ganzunten{
+            padding-left: calc(100vw * 0.05);
+            padding-right: calc(100vw * 0.05);
+            text-align: center;
+            font-size: 80%;
+        }
+        .ueberschrift{
+            position: relative;
+            top: 18px;
+            color: black;
+            font-size: 24px;
+        }
+        .ueberschrift2{
+            color: white;
+            font-size: 22px;
+            position: static;   
+        }
+        .login{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            justify-content: start;
+            top: 60px;
+            padding-top: 4px;
+            height: 220px;
+            width: 240px;
+            border-color: dodgerblue;
+            border-style: solid;
+            border-radius: 10px;
+            background-color: dodgerblue;
+            box-shadow: 4px 10px 6px lightgrey;
+        }
+        #pwdinput{
+            position: relative;
+            width: 140px;   
+            height: 22px;
+            border: none;
+            font-size: 20px;
+        }
+        #pwdinput:focus{
+            outline: none;
+            border-bottom-style: solid;
+            border-bottom-color: blue;
+            border-bottom-width: 4px;
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }
+        .login2{
+            position: relative;
+            display: flex;
+            justify-content: center;
+            top: 30px;
+        }
+        .btn2{
+            position: relative;
+            top: 60px;
+            display: flex;
+            justify-content: center;
+        }
+        #pwdbtn{
+            position: static;
+            border: none;
+            background-color: blue;
+            color: white;  
+            font-size: 22px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .auge{
+            position: relative;
+            left: 6px;
+            bottom: 6px;
+            width: 20px;
+            height: 20px;
+        }
+        #augebtn{
+            border: none;
+            background: none;
+            color: white;
+            font-size: 24px;
+        }
+        #durchgestrichen{
+            position: relative;
+            bottom: 31px;
+            left: 8px;
+            color: white;
+            font-size: 28px;
+            visibility: hidden;
+            border: none;
+            background: none;
+        }
+
+
+        @media (max-width: 600px){
+            .unten{
+                padding left: calc(100vw * 0.055);
+                padding right: calc(100vw * 0.055);
+                color: white;
+            } 
+            .links{
+                display:none;
+            }
+            .menubtn{
+                display: flex;
+            }
+            #menubtnclose{
+                position: absolute;
+                border: none;
+                background: none;
+                background-color: black;
+                color: white;
+                font-size: 24px;
+                text-align: start;
+            }
+            #links2{
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);   
+                right: 6px;
+                flex-direction: column;
+                width: 260px;
+                height: 290px;
+                margin: auto;
+                background-color: aliceblue;
+                border-width: 1px;
+                border-style: solid;
+                border-color: black;
+            }
+            .link2{
+                position: static;
+                justify-content: center;
+                align-items: center;
+                padding: 22px;
+                text-align: center;
+                color: black;
+                font-size: 20px;
+                border-top-width: 1px;
+                border-top-color: black;
+                border-top-style: solid;
+            }
+        }
+
+        @media(max-width: 380px){
+            .ueberschrift{
+                font-size: 20px;
+            }
+            .login{
+                zoom: 0.8;
+            }
+            .navbar{
+                zoom: 0.8;
+            }
+        }
+    </style>
+    <script>
+        function menuopen(){
+            document.getElementById("links2").style.display = "flex";
+            document.getElementById("oben").style.filter = "blur(3px)";
+            document.getElementById("oben").style.setProperty("-webkit-filter", "blur(3px)");
+        };
+        function menuclose(){
+            document.getElementById("links2").style.display = "none";
+            document.getElementById("oben").style.filter = "none";
+            document.getElementById("oben").style.setProperty("-webkit-filter", "none");
+        };
+        function auge(){
+            let type = document.querySelector("#pwdinput").type;
+            if (type == 'password'){
+                document.getElementById('pwdinput').type = "text";
+                document.getElementById('durchgestrichen').style.visibility = "visible";
+            }else{
+                document.getElementById('pwdinput').type = "password";
+                document.getElementById('durchgestrichen').style.visibility = "hidden";
+            }
+        }
+    </script>
+  </head>
+  <body>
+    <div id="oben">
+        <div class='roter-balken'></div>
+        <div class='navbar'>
+            <a href="/" class='headline'><h1>Regenpausen-<br> Radar</h1></a>
+            <div class="links">
+                <a href='https://www.wetter.com/deutschland/bitburg/DE0001210.html'>Wetter in Bitburg</a>
+                <a href='https://st-willi.de'>Schulhomepage</a>
+                <a href='https://makeyourschool.de'>Makeyourschool</a>
+                <a href="/">Home</a>
+            </div>
+            <div class="menubtn">
+                <button onclick="menuopen()" id="menubtn2"><img class="menubild" src="IMG/img4.png"></button>
+            </div>
+        </div>
+        <div class="unten">
+            <div class="ueberschrift">Login zum DBUG-Bereich:</div>
+            <div class="login">
+                <label class="ueberschrift2">Login: </label>
+                <form action="" method="post">
+                    <div class="login2">
+                        <input id="pwdinput" placeholder="Passwort: " type="password" name="pasword">
+                        <div class="auge">
+                            <button type="button" id="augebtn" onclick="auge()"> &#128065;</button>
+                            <button type="button" id="durchgestrichen" onclick="auge()"> \</button>
+                        </div>
+                    </div>
+                    <div class="btn2"><button id="pwdbtn" type="submit">Login</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="links2">
+        <button onclick="menuclose()" id="menubtnclose">x</button>
+        <div class="link2"><a href='https://www.wetter.com/deutschland/bitburg/DE0001210.html'>Wetter in Bitburg</a> </div>
+        <div class="link2"><a href='https://st-willi.de'>Schulhomepage</a></div>
+        <div class="link2"><a href='https://makeyourschool.de'>Makeyourschool</a></div>
+        <div class="link2"><a href="/">Home</a></div>
+    </div>
+    <div class="trennstrich"></div> 
+    <div class="ganzunten">
+        RPA <br> RegenPausenAlarm <br> <br> <br>
+        Konradin Schäfer, Eliah Jutz, Fabian Kuhl und Vince Palzkill <br> <br> 
+        St. Willibrord Gymnasium Bitburg <br> <br> <br>
+        &copy; - 2024
+    </div>
+  </body>
+</html>
