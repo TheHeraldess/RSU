@@ -1,0 +1,263 @@
+#include <SPI.h>        // Ethernet
+#include <Ethernet.h>   // Ethernet
+#include <Wire.h>       // Control RSU
+#include <rgb_lcd.h>    // Control RSU
+#include <MLX90615.h>   // Temperature Sensor
+#include <I2cMaster.h>  // Temperature Sensor
+
+#define WATER_SENSOR A3  // Number = Port, #define NAME_NAME = Define sensor (All uppercase!)
+#define PUMP 4          // Important
+#define BUTTON 7
+#define SDA_PIN 3
+#define SCL_PIN 2 
+
+// Ethernet
+byte mac[] = { 0x2C, 0xF7, 0xF1, 0x08, 0x1A, 0x72 };
+
+IPAddress ip(192,168,2,145);
+IPAddress server2(192, 168, 2, 100);
+IPAddress raspberry(192, 168, 2, 100);
+
+EthernetServer server(80);
+
+// Ethernet - LAST RAIN
+bool rainETH = false;
+bool rainETH2;
+unsigned long lastRain = 0;
+unsigned long startMillis = 0;
+int durationH = 0;
+int durationMin = 0;
+int durationS = 0;
+int durationD = 0;
+
+// Control
+rgb_lcd lcd;
+
+// Control - millis
+unsigned long previousMillis = 0;
+unsigned long previousMillisETH = 0;
+const long interval = 4000;
+unsigned long pumpStart = 0;
+const long pumpDuration = 15000;
+
+// Temperature
+SoftI2cMaster i2c(SDA_PIN, SCL_PIN);
+MLX90615 mlx90615(DEVICE_ADDR, &i2c);
+
+void setup() {
+  Serial.begin(9600);
+  Ethernet.begin(mac, ip);
+  server.begin();
+  Serial.begin(9600);
+  pinMode(WATER_SENSOR, INPUT);
+  pinMode(PUMP, OUTPUT);
+  pinMode(BUTTON, INPUT);
+  pinMode(8, OUTPUT);
+  //pinMode(lcd, OUTPUT)  
+  lcd.begin(16, 2);
+  lcd.setRGB(0, 0, 255);  
+
+  Serial.println("Test1");
+  lcd.print("Starting");
+  lcd.setCursor(0, 1);
+  lcd.print("System");
+  delay(4000);
+  lcd.setCursor(0, 0);
+  lcd.print("W-lan_Wire");
+  lcd.setCursor(0, 1);
+  lcd.print("Connected");
+  delay(4000);
+  lcd.setCursor(0, 0);
+  lcd.print("Deleting");
+  lcd.setCursor(0, 1);
+  lcd.print("Bugs");
+  startMillis = millis();
+}
+
+void loop() {
+  // TEMPERATURE
+  float temperature = mlx90615.getTemperature(MLX90615_AMBIENT_TEMPERATURE);
+
+  // CONTROL
+  unsigned long currentMillis = millis();
+  int intensityRaw = analogRead(WATER_SENSOR);
+  int intensity = map(intensityRaw, 0, 1023, 10, 0);
+  bool rain; 
+
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+
+    if (intensity < 8) {
+      rain = false;
+      Serial.println("No rain");
+    } else {
+      rain = true;
+      Serial.println("It's raining");
+    }
+
+    if (digitalRead(BUTTON) == HIGH) {
+      rain = true;
+    }
+
+    if (!rain) {
+      lcd.clear();
+      const int colorR = 255;
+      const int colorG = 0;
+      const int colorB = 0;
+      lcd.setRGB(colorR, colorG, colorB);
+      lcd.setCursor(0, 0);
+      lcd.print("Rain");
+      lcd.setCursor(0, 1);
+      lcd.print("No");
+      digitalWrite(PUMP, LOW); // Ensure pump is off
+    }
+    if (rain) {
+      lcd.clear();
+      int colorR = 0;
+      int colorG = 255;
+      int colorB = 0;
+      lcd.setRGB(colorR, colorG, colorB);
+      lcd.setCursor(0, 0);
+      lcd.print("Rain");
+      lcd.setCursor(0, 1);
+      lcd.print("Yes");
+
+      if (pumpStart == 0) { // If the pump hasn't started yet
+        pumpStart = currentMillis; // Store pump start time
+        digitalWrite(PUMP, HIGH); // Start the pump
+      } else {
+        if (currentMillis - pumpStart >= pumpDuration) { // Check if pump ran long enough
+          digitalWrite(PUMP, LOW); // Stop pump
+          pumpStart = 0; // Reset pump start time
+        }
+      }
+    }
+  }
+
+  // DURATION SINCE LAST RAIN / Duration of rain
+  rainETH2 = rainETH;
+   
+  if(intensity < 8){
+    rainETH = false;
+  } else {
+    rainETH = true;
+  }
+
+  if(!rainETH2 && rainETH || rainETH2 && !rainETH){
+    if(lastRain == 0){
+      lastRain = currentMillis - startMillis;
+    } else {
+      lastRain = currentMillis;
+    }
+  }
+
+  unsigned long sinceLastRain = (currentMillis - lastRain) / 1000;
+  durationD = sinceLastRain / 86400;
+  sinceLastRain %= 86400;
+  durationH = sinceLastRain / 3600;
+  sinceLastRain %= 3600;
+  durationMin = sinceLastRain / 60;
+  durationS = sinceLastRain % 60;
+
+  // REQUEST DATA
+  String tempRequest = String(temperature, 2);
+  tempRequest.replace(".", "");
+  tempRequest.replace("-", "");
+  String rqTemp;
+  if(temperature < 10){
+    rqTemp = "0" + tempRequest; 
+  } else if(temperature >= 100){
+    rqTemp = "0000";
+  } else if(temperature <= 0){
+    rqTemp = "2105";
+  } else {
+    rqTemp = tempRequest;
+  }
+  
+  int rainRequest = rainETH ? 1 : 0;
+  String rqRain = String(rainRequest);
+
+  String rqS = String(durationS);
+  String rqMin = String(durationMin);
+  String rqH = String(durationH);
+  String rqD = String(durationD);
+
+  if(durationS < 10) rqS = "0" + rqS;
+  if(durationMin < 10) rqMin = "0" + rqMin;
+  if(durationH < 10) rqH = "0" + rqH;
+  if(durationD < 10) rqD = "0" + rqD;
+  if(durationD > 99) rqD = rqD[rqD.length()] + rqD[rqD.length() + 1];
+
+  String rqLastRain = rqD + rqH + rqMin + rqS;
+
+  Serial.println(rqTemp);
+  Serial.println(temperature);
+
+  // Ethernet Data
+  String data = rqRain + rqTemp + rqLastRain;
+
+  if(currentMillis - previousMillisETH >= 5000){
+    previousMillisETH = currentMillis;
+    EthernetClient client2;
+    if (client2.connect(server2, 80)) {
+      client2.println("POST /empfang.html HTTP/1.1");
+      client2.println("Host: 192.168.2.100");
+      client2.println("Content-Type: application/x-www-form-urlencoded");
+      client2.println("Content-Length: 18");
+
+      client2.println();
+      client2.println("data=" + data);
+      
+      while (client2.connected()) {
+        if (client2.available()) {
+          char c = client2.read();
+        }
+      }
+      client2.stop();
+    } else {
+      Serial.println("Connection failed.");
+    }
+    Serial.println(data);
+  }
+
+  EthernetClient client = server.available();
+  if(client) {
+    String currentLine = "";
+    String request = "";
+    boolean currentLineIsBlank = true;
+    while (client.connected()) {
+      if (client.available()) {
+        char c = client.read();
+        currentLine += c;
+
+        if (c == '\n') {
+          if (currentLine.startsWith("GET")) {
+            request = currentLine;
+            Serial.println("Request received: " + request);
+          }
+          currentLine = "";
+        }
+
+        if (currentLine.length() == 1 && currentLine[0] == '\r') {
+          break;
+        }
+      }
+    }
+
+    client.stop();
+    Serial.println("Client connection closed");
+  }
+}
+
+void actions(String parameter){
+  char action = parameter[0];
+  int actionAscii = int(action);
+  char value = parameter[2];
+  int valueAscii = int(value);
+  
+  if(actionAscii == 49 && valueAscii == 49) {
+    digitalWrite(8, HIGH);
+  } else if (actionAscii == 49 && valueAscii == 48) {
+    digitalWrite(8, LOW);
+  }
+}
